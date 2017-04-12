@@ -6,7 +6,7 @@
 # with access to the "myapp" database.
 #
 ---
-- name: Postgresql Installation
+- hosts: ubuntu@ec2-34-205-191-251.compute-1.amazonaws.com
   become: yes
   gather_facts: no
 
@@ -20,15 +20,15 @@
         - libpq-dev
         - python-psycopg2
 
-- hosts: localhost
+- hosts: webservers
   become: yes
   become_user: postgres
   gather_facts: no
 
   vars:
-    dbname: erpnext
-    dbuser: erpnext
-    dbpassword: erpnext
+    dbname: myapp
+    dbuser: django
+    dbpassword: mysupersecretpassword
 
   tasks:
   - name: ensure database is created
