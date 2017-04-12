@@ -7,7 +7,6 @@
 #
 ---
 - name: Postgresql Installation
-  hosts: localhost
   become: yes
   gather_facts: no
 
@@ -21,7 +20,7 @@
         - libpq-dev
         - python-psycopg2
 
-- hosts: localhost
+- name: Create Database
   become: yes
   become_user: postgres
   gather_facts: no
