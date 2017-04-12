@@ -105,10 +105,16 @@ def install_bench(args):
 	extra_vars.update(branch=branch)
 
 	if args.develop:
-		run_playbook('develop/install.yml', sudo=True, extra_vars=extra_vars)
+		if args.db and args.db.lower() == "postgresql":			
+			run_playbook('develop_pg/install.yml', sudo=True, extra_vars=extra_vars)
+		else:
+			run_playbook('develop/install.yml', sudo=True, extra_vars=extra_vars)
 
 	elif args.production:
-		run_playbook('production/install.yml', sudo=True, extra_vars=extra_vars)
+		if args.db and args.db.lower() == "postgresql":
+			run_playbook('production_pg/install.yml', sudo=True, extra_vars=extra_vars)
+		else:
+			run_playbook('production/install.yml', sudo=True, extra_vars=extra_vars)
 
 	if os.path.exists(tmp_bench_repo):
 		shutil.rmtree(tmp_bench_repo)
@@ -327,6 +333,10 @@ def parse_commandline_args():
 	parser.add_argument('--bench-branch', dest='bench_branch', help='Clone a particular branch of bench repository')
 
 	parser.add_argument('--repo-url', dest='repo_url', help='Clone bench from the given url')
+
+	# Add option to support Postgresql as db, default is MariaDB.
+
+	parser.add_argument('--db', dest='db', help='Specify database backend ( MariaDB is default )')
 
 	# To enable testing of script using Travis, this should skip the prompt
 	parser.add_argument('--run-travis', dest='run_travis', action='store_true', default=False,
