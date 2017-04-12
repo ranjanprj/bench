@@ -3,9 +3,7 @@
   vars:
     bench_repo_path: "/home/{{ ansible_user_id }}/.bench"
     bench_path: "/home/{{ ansible_user_id }}/frappe-bench"
-    mysql_config_template: "templates/simple_mariadb_config.cnf"
-    mysql_conf_dir: /etc/mysql/conf.d/
-
+   
   tasks:
 
   # install pre-requisites
@@ -16,8 +14,7 @@
       - build-essential
       - redis-server
 
-      # for mariadb
-      - software-properties-common
+     
 
       # for wkhtmltopdf
       - libxrender1
@@ -88,13 +85,13 @@
     become: yes
     become_user: root
 
-  # install MariaDB
+  # install Postgresql
   - include: includes/postgresql_ubuntu.yml
 
   # install WKHTMLtoPDF
   - include: includes/wkhtmltopdf.yml
 
-  # setup MariaDB
+  # setup Postgresql
   - include: includes/setup_postgresql.yml
 
   - debug:
