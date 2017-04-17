@@ -97,7 +97,7 @@ def install_bench(args):
 	extra_vars.update(repo_path=repo_path)
 	run_playbook('develop/create_user.yml', extra_vars=extra_vars)
 
-	extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup))
+	extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup,args.db))
 	if args.production:
 		extra_vars.update(max_worker_connections=multiprocessing.cpu_count() * 1024)
 
@@ -235,18 +235,18 @@ def could_not_install(package):
 def is_sudo_user():
 	return os.geteuid() == 0
 
-def get_passwords(ignore_prompt=False):
+def get_passwords(ignore_prompt=False,db="Mysql"):
 	if not ignore_prompt:
-		mysql_root_password, admin_password = '', ''
+		db_root_password, admin_password = '', ''
 		pass_set = True
 		while pass_set:
 			# mysql root password
-			if not mysql_root_password:
-				mysql_root_password = getpass.unix_getpass(prompt='Please enter mysql root password: ')
-				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter mysql root password: ')
+			if not db_root_password:
+				db_root_password = getpass.unix_getpass(prompt='Please enter ' + db + ' root password: ')
+				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter '+ db +' root password: ')
 
-				if mysql_root_password != conf_mysql_passwd:
-					mysql_root_password = ''
+				if db_root_password != conf_mysql_passwd:
+					db_root_password = ''
 					continue
 
 			# admin password
@@ -260,10 +260,10 @@ def get_passwords(ignore_prompt=False):
 
 			pass_set = False
 	else:
-		mysql_root_password = admin_password = 'travis'
+		db_root_password = admin_password = 'travis'
 
 	passwords = {
-		'mysql_root_password': mysql_root_password,
+		'db_root_password': db_root_password,
 		'admin_password': admin_password
 	}
 
