@@ -236,14 +236,16 @@ def is_sudo_user():
 	return os.geteuid() == 0
 
 def get_passwords(ignore_prompt=False,db="Mysql"):
+	if db is None:
+		db = "MySql"
 	if not ignore_prompt:
 		db_root_password, admin_password = '', ''
 		pass_set = True
 		while pass_set:
 			# mysql root password
 			if not db_root_password:
-				db_root_password = getpass.unix_getpass(prompt='Please enter ' + db + ' root password: ')
-				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter '+ db +' root password: ')
+				db_root_password = getpass.unix_getpass(prompt='Please enter ' + str(db) + ' root password: ')
+				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter '+ str(db) +' root password: ')
 
 				if db_root_password != conf_mysql_passwd:
 					db_root_password = ''

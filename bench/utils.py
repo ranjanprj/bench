@@ -17,7 +17,7 @@ def get_frappe(bench_path='.'):
 	frappe = get_env_cmd('frappe', bench_path=bench_path)
 	if not os.path.exists(frappe):
 		print 'frappe app is not installed. Run the following command to install frappe'
-		print 'bench get-app https://github.com/frappe/frappe.git'
+		print 'bench get-app https://github.com/ranjanprj/frappe.git'
 	return frappe
 
 def get_env_cmd(cmd, bench_path='.'):
