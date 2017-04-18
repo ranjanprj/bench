@@ -1,3 +1,4 @@
 sudo apt-get install -y python
 wget https://raw.githubusercontent.com/ranjanprj/bench/master/playbooks/install.py
+sudo python install.py --develop --user frappe
 sudo python install.py --develop --user frappe --db Postgresql

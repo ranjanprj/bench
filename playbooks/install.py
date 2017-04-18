@@ -98,6 +98,13 @@ def install_bench(args):
 	run_playbook('develop/create_user.yml', extra_vars=extra_vars)
 
 	extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup,args.db))
+
+	# No database specified, use Mariadb, else use specified database
+	if arg.db is None:
+		extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup))
+	elif arg.db.lower() == "postgresql":
+		extra_vars.update(get_passwords_pg(args.run_travis or args.without_bench_setup))
+
 	if args.production:
 		extra_vars.update(max_worker_connections=multiprocessing.cpu_count() * 1024)
 
@@ -235,17 +242,56 @@ def could_not_install(package):
 def is_sudo_user():
 	return os.geteuid() == 0
 
-def get_passwords(ignore_prompt=False,db="Mysql"):
-	if db is None:
-		db = "MySql"
+def get_passwords(ignore_prompt=False):
+	if not ignore_prompt:
+		mysql_root_password, admin_password = '', ''
+		pass_set = True
+		while pass_set:
+			# mysql root password
+			if not mysql_root_password:
+				mysql_root_password = getpass.unix_getpass(prompt='Please enter mysql root password: ')
+				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter mysql root password: ')
+
+				if mysql_root_password != conf_mysql_passwd:
+					mysql_root_password = ''
+					continue
+
+			# admin password
+			if not admin_password:
+				admin_password = getpass.unix_getpass(prompt='Please enter the default Administrator user password: ')
+				conf_admin_passswd = getpass.unix_getpass(prompt='Re-enter Administrator password: ')
+
+				if admin_password != conf_admin_passswd:
+					admin_password = ''
+					continue
+
+			pass_set = False
+	else:
+		mysql_root_password = admin_password = 'travis'
+
+	passwords = {
+		'mysql_root_password': mysql_root_password,
+		'admin_password': admin_password
+	}
+
+	if not ignore_prompt:
+		passwords_file_path = os.path.join(os.path.expanduser('~'), 'passwords.txt')
+		with open(passwords_file_path, 'w') as f:
+			json.dump(passwords, f, indent=1)
+
+		print('Passwords saved at ~/passwords.txt')
+
+	return passwords
+
+def get_passwords_pg(ignore_prompt=False):
 	if not ignore_prompt:
 		db_root_password, admin_password = '', ''
 		pass_set = True
 		while pass_set:
 			# mysql root password
 			if not db_root_password:
-				db_root_password = getpass.unix_getpass(prompt='Please enter ' + str(db) + ' root password: ')
-				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter '+ str(db) +' root password: ')
+				db_root_password = getpass.unix_getpass(prompt='Please enter Postgresql root password: ')
+				conf_mysql_passwd = getpass.unix_getpass(prompt='Re-enter Postgresql root password: ')
 
 				if db_root_password != conf_mysql_passwd:
 					db_root_password = ''
@@ -265,7 +311,7 @@ def get_passwords(ignore_prompt=False,db="Mysql"):
 		db_root_password = admin_password = 'travis'
 
 	passwords = {
-		'db_root_password': db_root_password,
+		'postgresql_root_password': db_root_password,
 		'admin_password': admin_password
 	}
 

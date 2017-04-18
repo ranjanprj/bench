@@ -151,6 +151,23 @@ def new_site(site, mariadb_root_password=None, admin_password=None, bench_path='
 	if len(get_sites(bench_path=bench_path)) == 1:
 		exec_cmd("{frappe} --use {site}".format(frappe=get_frappe(bench_path=bench_path), site=site), cwd=os.path.join(bench_path, 'sites'))
 
+
+def new_site_pg(site, postgresql_root_password=None, admin_password=None, bench_path='.'):
+	import hashlib
+	logger.info('creating new site {}'.format(site))
+	postgresql_root_password_fragment = '--root_password {}'.format(postgresql_root_password) if postgresql_root_password else ''
+	admin_password_fragment = '--admin_password {}'.format(admin_password) if admin_password else ''
+	exec_cmd("{frappe} {site} --install {db_name} {postgresql_root_password_fragment} {admin_password_fragment}".format(
+				frappe=get_frappe(bench_path=bench_path),
+				site=site,
+				db_name = hashlib.sha1(site).hexdigest()[:10],
+				postgresql_root_password_fragment=postgresql_root_password_fragment,
+				admin_password_fragment=admin_password_fragment
+			), cwd=os.path.join(bench_path, 'sites'))
+	if len(get_sites(bench_path=bench_path)) == 1:
+		exec_cmd("{frappe} --use {site}".format(frappe=get_frappe(bench_path=bench_path), site=site), cwd=os.path.join(bench_path, 'sites'))
+
+
 def patch_sites(bench_path='.'):
 	bench.set_frappe_version(bench_path=bench_path)
 
