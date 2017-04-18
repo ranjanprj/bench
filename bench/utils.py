@@ -109,6 +109,9 @@ def clone_apps_from(bench_path, clone_from):
 		setup_app(app)
 
 def exec_cmd(cmd, cwd='.'):
+	logger.info("Executing command")
+	logger.info("====================================")
+	logger.info(cmd)
 	from .cli import from_command_line
 
 	async = False if from_command_line else True
