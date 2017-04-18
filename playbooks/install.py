@@ -97,12 +97,11 @@ def install_bench(args):
 	extra_vars.update(repo_path=repo_path)
 	run_playbook('develop/create_user.yml', extra_vars=extra_vars)
 
-	extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup,args.db))
 
 	# No database specified, use Mariadb, else use specified database
-	if arg.db is None:
+	if args.db is None:
 		extra_vars.update(get_passwords(args.run_travis or args.without_bench_setup))
-	elif arg.db.lower() == "postgresql":
+	elif args.db.lower() == "postgresql":
 		extra_vars.update(get_passwords_pg(args.run_travis or args.without_bench_setup))
 
 	if args.production:
